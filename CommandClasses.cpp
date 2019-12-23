@@ -54,7 +54,7 @@ int DefineVarCommand::execute(std::list<std::string> info) {
   // object foe keeping the variable data
   VariableData vd;
   double val;
-
+  bool is_regular_set = false;
   auto iter = info.begin();
   std::string key = *iter;
   iter++;
@@ -62,8 +62,10 @@ int DefineVarCommand::execute(std::list<std::string> info) {
   if (*iter == "->" || *iter == "<-") {
     vd.set_arrow_dir(*iter);
     vd.set_sim(info.back());
+    is_regular_set = false;
   } else if (*iter == "=") {
-    if (is_expression(info.back())) {
+      is_regular_set = true;
+      if (is_expression(info.back())) {
       vd.set_value(get_exp_value(info.back()));
     } else if (is_number(info.back())){
       std::stringstream ss(info.back());
@@ -82,7 +84,7 @@ int DefineVarCommand::execute(std::list<std::string> info) {
   //add to map
   SymbolTable::get_instance()->add_to_server(key, vd);
 
-  return DefineVarCommand::args_num;
+  return is_regular_set ? DefineVarCommand::args_num-1 : DefineVarCommand::args_num;
 }
 
 bool DefineVarCommand::is_expression(std::string string) {

@@ -109,6 +109,16 @@ std::vector<std::string> utilities::lexer(const char* file_name) {
                     variable = line.substr(0, index);
                 expresion = line.substr(index + 1);
                 expresion.erase(std::remove(expresion.begin(), expresion.end(), ' '), expresion.end());
+                int idx;
+                if ((idx = variable.find(' '))!= -1)
+                {
+                    string tmp_variable = variable.substr(0, idx);
+                    if(tmp_variable == "var")
+                    {
+                        tokens->push_back(tmp_variable);
+                        variable = variable.substr(idx +1);
+                    }
+                }
                 variable.erase(std::remove(variable.begin(), variable.end(), ' '), variable.end());
                 tokens->push_back(variable);
                 tokens->push_back("=");
