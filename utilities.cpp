@@ -102,7 +102,7 @@ std::vector<std::string> utilities::lexer(const char* file_name) {
                 ss1 << line;
                 std::replace(line_part.begin(), line_part.end(), '(', ' ');
                 std::replace(line_part.begin(), line_part.end(), ')', ' ');
-            } else if ((index = line.find('=')) != -1 && line.find("while") == -1) {
+            } else if ((index = line.find('=')) != -1 && line.find("while") == -1 && line.find("if") == -1) {
                 if (line[0] == ' ')
                     variable = line.substr(1, index - 1);
                 else
@@ -143,11 +143,21 @@ void utilities::parser(std::vector<std::string> vec,std::map<std::string, Comman
         if(commandMap.find(vec[i]) != commandMap.end())
         {
             Command* c= commandMap[vec[i]];
-            int numOfArgs= c->getNumOfArgs();
             std::list<std::string> args;
-            for(int k=0; k<numOfArgs; k++)
+            if(vec[i] == "while" || vec[i] == "if")
             {
-                args.push_back(vec[i+1+k]);
+                i++;
+                while (vec[i] != "}")
+                {
+                    args.push_back(vec[i]);
+                    i++;
+                }
+                args.push_back(vec[i]);
+            }
+            else {
+                int numOfArgs = c->getNumOfArgs();for (int k = 0; k < numOfArgs; k++) {
+                    args.push_back(vec[i + 1 + k]);
+                }
             }
             i+= c->execute(args)+1;
         }

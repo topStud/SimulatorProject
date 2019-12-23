@@ -113,9 +113,9 @@ int SetValueCommand::execute(std::list<std::string> info) {
 int WhileCommand::execute(std::list<std::string> info) {
     string exp1 = info.front();
     info.pop_front();
-    string exp2 = info.front();
-    info.pop_front();
     string op = info.front();
+    info.pop_front();
+    string exp2 = info.front();
     info.pop_front();
 
     auto* interpreter = new Interpreter(SymbolTable::get_instance()->get_server_map());
@@ -140,9 +140,9 @@ int WhileCommand::execute(std::list<std::string> info) {
 int IfCommand::execute(std::list<std::string> info) {
     string exp1 = info.front();
     info.pop_front();
-    string exp2 = info.front();
-    info.pop_front();
     string op = info.front();
+    info.pop_front();
+    string exp2 = info.front();
     info.pop_front();
 
     auto* interpreter = new Interpreter(SymbolTable::get_instance()->get_server_map());
