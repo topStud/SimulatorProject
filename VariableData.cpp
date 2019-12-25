@@ -5,7 +5,7 @@
 #include "VariableData.h"
 
 // -1 for left, 1 for right
-int VariableData::get_arrow() const {
+std::string VariableData::get_arrow() const {
   return this->arrow_dir;
 }
 
@@ -19,10 +19,7 @@ double VariableData::get_value() const {
 
 // 0 refers to left, 1 refers to right
 void VariableData::set_arrow_dir(std::string arrow) {
-  if (arrow == "->")
-    this->arrow_dir = 1;
-  else
-    this->arrow_dir = -1;
+  this->arrow_dir = arrow;
 }
 
 void VariableData::set_sim(std::string sim_str) {

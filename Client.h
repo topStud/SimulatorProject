@@ -18,13 +18,12 @@ class Client {
   void connect_com(const std::string& ip, int port) const;
  public:
   Client(const std::string& ip, int port);
-  int get_client_sock() const;
   void send_message_to_server(std::string str) const;
   void close_socket() const;
 };
 
 // global
-static bool flag_stop_communication;
+static bool flag_stop_communication_client;
 void start_sock(const Client& c);
 
 #endif //MILESTONE1__CLIENT_H_

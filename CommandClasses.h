@@ -17,7 +17,7 @@ class OpenServerCommand: public Command {
   static const int args_num = 1;
   OpenServerCommand()= default;
   int execute(std::list<std::string> info) override;
-  int getNumOfArgs() const { return args_num;}
+  int getNumOfArgs() const override { return args_num;}
 };
 
 class ConnectCommand: public Command {
@@ -25,7 +25,7 @@ class ConnectCommand: public Command {
   static const int args_num = 2;
   ConnectCommand()= default;
   int execute(std::list<std::string> info) override;
-  int getNumOfArgs() const { return args_num;}
+  int getNumOfArgs() const override { return args_num;}
 };
 
 class DefineVarCommand: public Command {
@@ -36,7 +36,7 @@ class DefineVarCommand: public Command {
   bool is_expression(std::string string);
   bool is_number(std::string string);
   double get_exp_value(std::string exp);
-  int getNumOfArgs() const { return args_num;}
+  int getNumOfArgs() const override { return args_num;}
 };
 
 class PrintCommand: public Command {
@@ -44,7 +44,7 @@ class PrintCommand: public Command {
   static const int args_num = 1;
   PrintCommand()= default;
   int execute(std::list<std::string> info) override;
-  int getNumOfArgs() const { return args_num;}
+  int getNumOfArgs() const override { return args_num;}
 };
 
 class SleepCommand: public Command {
@@ -52,7 +52,7 @@ class SleepCommand: public Command {
   static const int args_num = 1;
   SleepCommand()= default;
   int execute(std::list<std::string> info) override;
-  int getNumOfArgs() const { return args_num;}
+  int getNumOfArgs() const override { return args_num;}
 };
 
 class SetValueCommand: public Command {
@@ -60,21 +60,21 @@ class SetValueCommand: public Command {
   static const int args_num = 3;
   SetValueCommand()= default;
   int execute(std::list<std::string> info) override;
-  int getNumOfArgs() const { return args_num;}
+  int getNumOfArgs() const override { return args_num;}
 };
 
 class WhileCommand: public Command {
 public:
     WhileCommand()= default;
     int execute(std::list<std::string> info) override;
-    int getNumOfArgs() const { return 0;}
+    int getNumOfArgs() const override { return 0;}
 };
 
 class IfCommand: public Command {
 public:
     IfCommand()= default;
     int execute(std::list<std::string> info) override;
-    int getNumOfArgs() const { return 0;}
+    int getNumOfArgs() const override { return 0;}
 };
 
 #endif //MILESTONE1__COMMANDCLASSES_H_

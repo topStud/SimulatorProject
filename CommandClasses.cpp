@@ -3,11 +3,11 @@
 //
 #include <thread>
 #include <regex>
-
 #include "CommandClasses.h"
 #include "SymbolTable.h"
 #include "Server.h"
 #include "utilities.h"
+#include "UpdateSimulator.h"
 
 int OpenServerCommand::execute(std::list<std::string> info)
 {
@@ -27,6 +27,7 @@ int OpenServerCommand::execute(std::list<std::string> info)
 int ConnectCommand::execute(std::list<std::string> info) {
   int port;
   std::string ip = *info.begin();
+  ip.erase(std::remove(ip.begin(), ip.end(), '\"'), ip.end());
   // converting the string port to int
   std::stringstream ss(info.back());
   ss >> port;
@@ -37,16 +38,25 @@ int ConnectCommand::execute(std::list<std::string> info) {
 }
 
 int PrintCommand::execute(std::list<std::string> info) {
-  std::cout << info.back() << std::endl;
+  if (info.back()[0] == '\"') {
+    std::cout << info.back() << std::endl;
+  } else {
+    auto *i = new Interpreter(SymbolTable::get_instance()->get_server_map());
+    Expression* e = i->interpret(info.back());
+    std::cout << e->calculate() << std::endl;
+    delete i;
+  }
   return PrintCommand::args_num;
 }
 
 int SleepCommand::execute(std::list<std::string> info) {
   // converts number of seconds from string to int
   int mil_sec_n;
-  std::stringstream ss(info.back());
-  ss >> mil_sec_n;
+  auto *i = new Interpreter(SymbolTable::get_instance()->get_server_map());
+  Expression* e = i->interpret(info.back());
+  mil_sec_n = (int) e->calculate();
   std::chrono::milliseconds timespan(mil_sec_n);
+  delete i;
   return SleepCommand::args_num;
 }
 
@@ -82,6 +92,9 @@ int DefineVarCommand::execute(std::list<std::string> info) {
   }
 
   //add to map
+  if (vd.get_arrow() == "<-" || vd.get_arrow() == "->") {
+      SymbolTable::get_instance()->add_to_sim(key, vd);
+  }
   SymbolTable::get_instance()->add_to_server(key, vd);
 
   return is_regular_set ? DefineVarCommand::args_num-1 : DefineVarCommand::args_num;
@@ -109,6 +122,8 @@ int SetValueCommand::execute(std::list<std::string> info) {
     Expression* e = interpreter->interpret(info.back());
     double val = e->calculate();
     SymbolTable::get_instance()->get_key_value_server(info.front()).set_value(val);
+    // inform the simulator of the value placement
+    UpdateSimulator::get_instance()->add_update(info.front());
     return SetValueCommand::args_num;
 }
 

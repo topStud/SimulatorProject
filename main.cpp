@@ -6,6 +6,7 @@
 #include "CommandClasses.h"
 #include "Client.h"
 #include "utilities.h"
+#include "Server.h"
 
 map<std::string, Command *> utilities::commands_map;
 
@@ -22,10 +23,8 @@ int main(int argc, char *argv[]) {
   utilities::init_command_map();
   utilities::parser(tokens,utilities::get_command_map());
 
-
-
-
-
+  flag_stop_communication_client = true;
+  flag_stop_communication_server = true;
 
 /*
   Command* var_c = new DefineVarCommand();
@@ -34,11 +33,11 @@ int main(int argc, char *argv[]) {
   var_c->execute(var_l);
   var_c->execute(var_l1);
 */
-    OpenServerCommand* serverCommand = new OpenServerCommand();
+    /*OpenServerCommand* serverCommand = new OpenServerCommand();
     std::list<std::string> inp = {"5400"};
 
     serverCommand->execute(inp);
-
+*/
   // check sleep
 /*  Command* slp = new SleepCommand();
   std::list<std::string> slp_list = {"3"};
@@ -59,7 +58,6 @@ int main(int argc, char *argv[]) {
   sleep(5);
   flag_stop_communication = true;
 */
-while(true){}
   return 0;
 }
 

@@ -1,9 +1,8 @@
 #include "Server.h"
 
-
-
 Server::Server(int port)
 {
+    flag_stop_communication_server = false;
     this->m_port= port;
 }
 
@@ -48,6 +47,8 @@ void Server::listenAndAccept()
 
     if (m_serverSocket == -1) {
         throw "Error accepting client";
+    } else {
+      std::cout << "accepted the client" << std::endl;
     }
 
     close(m_serverSocket); //closing the listening socket
@@ -60,13 +61,20 @@ void Server::readDataFromClient() const
     std::cout<< "Num of Bytes: " << val_read <<", Data: " << buffer<<std::endl;
 }
 
-void runServer(const Server &server)
+int Server::get_serverSocket() {
+  return this->m_serverSocket;
+}
+
+void runServer(Server server)
 {
     while(true)
     {
+        if (flag_stop_communication_server) {
+          close(server.get_serverSocket());
+          break;
+        }
         server.readDataFromClient();
     }
-
 }
 
 
