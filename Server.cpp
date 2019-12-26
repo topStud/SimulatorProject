@@ -1,7 +1,6 @@
 #include "Server.h"
 
 
-
 Server::Server(int port)
 {
     this->m_port= port;
@@ -55,9 +54,13 @@ void Server::listenAndAccept()
 
 void Server::readDataFromClient() const
 {
-    char buffer[1024] = {0};
-    int val_read = read( m_clientSocket , buffer, 1024);
+    char buffer[325] = {0};
+    buffer[324] = '\0';
+    int val_read = read( m_clientSocket , buffer, 324);
     std::cout<< "Num of Bytes: " << val_read <<", Data: " << buffer<<std::endl;
+    std::vector<double> vec = splitString(buffer);
+    for (std::size_t i = 0; i < vec.size(); i++)
+        std::cout << vec[i] << std::endl;
 }
 
 void runServer(const Server &server)
@@ -69,19 +72,35 @@ void runServer(const Server &server)
 
 }
 
+std::vector<double> Server::splitString(std::string str) const
+{
+    std::vector<double> vec;
+
+    std::stringstream ss(str);
+
+    for (double i; ss >> i;)
+    {
+        vec.push_back(i);
+        if (ss.peek() == ',')
+        {
+            ss.ignore();
+        }
+    }
+
+    for (std::size_t i = 0; i < vec.size(); i++)
+        std::cout << vec[i] << std::endl;
+
+    return vec;
+}
 
 
-
-/*
-
-    //reading from client
-    char buffer[1024] = {0};
-    int valread = read( client_socket , buffer, 1024);
-    std::cout<<buffer<<std::endl;
-
-    //writing back to client
-    char *hello = "Hello, I can hear you! \n";
-    send(client_socket , hello , strlen(hello) , 0 );
-    std::cout<<"Hello message sent\n"<<std::endl;
-    return 0;
-*/
+/* airspeed-indicator_indicated-speed-kt, time_warp, switches_magnetos, heading-indicator_offset-deg,
+ * altimeter_indicated-altitude-ft, altimeter_pressure-alt-ft, attitude-indicator_indicated-pitch-deg,
+ * attitude-indicator_indicated-roll-deg, attitude-indicator_internal-pitch-deg, attitude-indicator_internal-roll-deg,
+ * encoder_indicated-altitude-ft, encoder_pressure-alt-ft, gps_indicated-altitude-ft, gps_indicated-ground-speed-kt,
+ * gps_indicated-vertical-speed, indicated-heading-deg, magnetic-compass_indicated-heading-deg,
+ * slip-skid-ball_indicated-slip-skid, turn-indicator_indicated-turn-rate, vertical-speed-indicator_indicated-speed-fpm,
+ * flight_aileron, flight_elevator, flight_rudder, flight_flaps, engine_throttle, current-engine_throttle,
+ * switches_master-avionics, switches_starter, active-engine_auto-start, flight_speedbrake, c172p_brake-parking,
+ * engine_primer, current-engine_mixture, switches_master-bat, switches_master-alt, engine_rpm
+ * */
