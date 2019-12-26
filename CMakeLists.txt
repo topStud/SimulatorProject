@@ -25,4 +25,4 @@ add_executable(SimulatorProject
         utilities.cpp
         utilities.h
         VariableData.cpp
-        VariableData.h)
+        VariableData.h UpdateSimulator.cpp UpdateSimulator.h)

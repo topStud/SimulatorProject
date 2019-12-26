@@ -26,6 +26,7 @@ private:
 public:
     Server(int port);
     void createSocket();
+    int get_serverSocket();
     void bindSocket();
     void listenAndAccept();
     void readDataFromClient() const;
@@ -36,6 +37,7 @@ public:
 };
 
 // global
-void runServer(const Server &server);
+static bool flag_stop_communication_server;
+void runServer(Server server);
 
 #endif //EX3_SERVER_H

@@ -1,8 +1,10 @@
 #include "Server.h"
 
 
+
 Server::Server(int port)
 {
+    flag_stop_communication_server = false;
     this->m_port= port;
 }
 
@@ -47,6 +49,8 @@ void Server::listenAndAccept()
 
     if (m_serverSocket == -1) {
         throw "Error accepting client";
+    } else {
+      std::cout << "accepted the client" << std::endl;
     }
 
     close(m_serverSocket); //closing the listening socket
@@ -63,10 +67,18 @@ void Server::readDataFromClient() const
         std::cout << vec[i] << std::endl;
 }
 
-void runServer(const Server &server)
+int Server::get_serverSocket() {
+  return this->m_serverSocket;
+}
+
+void runServer(Server server)
 {
     while(true)
     {
+        if (flag_stop_communication_server) {
+          close(server.get_serverSocket());
+          break;
+        }
         server.readDataFromClient();
     }
 
@@ -93,14 +105,3 @@ std::vector<double> Server::splitString(std::string str) const
     return vec;
 }
 
-
-/* airspeed-indicator_indicated-speed-kt, time_warp, switches_magnetos, heading-indicator_offset-deg,
- * altimeter_indicated-altitude-ft, altimeter_pressure-alt-ft, attitude-indicator_indicated-pitch-deg,
- * attitude-indicator_indicated-roll-deg, attitude-indicator_internal-pitch-deg, attitude-indicator_internal-roll-deg,
- * encoder_indicated-altitude-ft, encoder_pressure-alt-ft, gps_indicated-altitude-ft, gps_indicated-ground-speed-kt,
- * gps_indicated-vertical-speed, indicated-heading-deg, magnetic-compass_indicated-heading-deg,
- * slip-skid-ball_indicated-slip-skid, turn-indicator_indicated-turn-rate, vertical-speed-indicator_indicated-speed-fpm,
- * flight_aileron, flight_elevator, flight_rudder, flight_flaps, engine_throttle, current-engine_throttle,
- * switches_master-avionics, switches_starter, active-engine_auto-start, flight_speedbrake, c172p_brake-parking,
- * engine_primer, current-engine_mixture, switches_master-bat, switches_master-alt, engine_rpm
- * */

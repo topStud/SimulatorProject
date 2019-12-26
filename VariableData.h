@@ -10,12 +10,12 @@
 class VariableData {
   std::string sim;
   double value;
-  int arrow_dir;
+  std::string arrow_dir;
  public:
-  VariableData() : sim{}, value(0), arrow_dir(0) {}
+  VariableData() : sim{}, value(0), arrow_dir{} {}
   std::string get_sim() const;
   double get_value() const;
-  int get_arrow() const;
+  std::string get_arrow() const;
   void set_value(double val);
   void set_arrow_dir(std::string arrow);
   void set_sim(std::string sim_str);

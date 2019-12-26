@@ -122,7 +122,7 @@ std::vector<std::string> utilities::lexer(const char* file_name) {
                 variable.erase(std::remove(variable.begin(), variable.end(), ' '), variable.end());
                 tokens->push_back(variable);
                 tokens->push_back("=");
-                tokens->push_back(expresion);
+                tokens->push_back(add_brackets_to_var(expresion));
                 continue;
             }
 
@@ -132,6 +132,40 @@ std::vector<std::string> utilities::lexer(const char* file_name) {
 
     in_file.close();
     return *tokens;
+}
+
+std::string utilities::add_brackets_to_var(std::string expression) {
+  // vars for the check
+  std::regex r("(.*[a-zA-Z]+.*)*");
+  // vars for the loop
+  bool part_of_str = false;
+  std::string new_exp{};
+
+  // checks if there are characters in the expression
+  if (!std::regex_match(expression, r)) {
+    return expression;
+  }
+
+  // adds brackets around vars
+  for (int i = 0; i < expression.length(); i++) {
+    if ((expression[i] >= 'a' && expression[i] <= 'z') || (expression[i] >= 'A' && expression[i] <= 'Z')) {
+      if (!part_of_str) {
+        new_exp += "(";
+        part_of_str = true;
+      }
+    } else {
+      // numbers can be part of the variable
+      if (part_of_str && !(expression[i] >= '0' && expression[i] <= '9')) {
+        new_exp += ")";
+        part_of_str = false;
+      }
+    }
+    new_exp += expression[i];
+  }
+  if (part_of_str) {
+    new_exp += ")";
+  }
+  return new_exp;
 }
 
 void utilities::init_command_map() {
@@ -147,7 +181,7 @@ void utilities::init_command_map() {
 
 void utilities::parser(std::vector<std::string> vec,std::map<std::string, Command*> commandMap)
 {
-    int i= 0;
+    int i = 0;
     while(i< vec.size())
     {
         if(commandMap.find(vec[i]) != commandMap.end())
@@ -165,7 +199,8 @@ void utilities::parser(std::vector<std::string> vec,std::map<std::string, Comman
                 args.push_back(vec[i]);
             }
             else {
-                int numOfArgs = c->getNumOfArgs();for (int k = 0; k < numOfArgs; k++) {
+                int numOfArgs = c->getNumOfArgs();
+                for (int k = 0; k < numOfArgs; k++) {
                     args.push_back(vec[i + 1 + k]);
                 }
             }
