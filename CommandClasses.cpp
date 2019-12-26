@@ -11,10 +11,11 @@
 
 int OpenServerCommand::execute(std::list<std::string> info)
 {
-    auto* interpreter = new Interpreter(SymbolTable::get_instance()->get_server_map());
+    auto* interpreter = new Interpreter(SymbolTable::get_instance()->get_main_map());
     Expression* e = interpreter->interpret(info.back());
     delete interpreter;
     int port= e->calculate();
+    delete e;
     Server s(port);
     s.createSocket();
     s.bindSocket();
@@ -41,10 +42,11 @@ int PrintCommand::execute(std::list<std::string> info) {
   if (info.back()[0] == '\"') {
     std::cout << info.back() << std::endl;
   } else {
-    auto *i = new Interpreter(SymbolTable::get_instance()->get_server_map());
+    auto *i = new Interpreter(SymbolTable::get_instance()->get_main_map());
     Expression* e = i->interpret(info.back());
     std::cout << e->calculate() << std::endl;
     delete i;
+    delete e;
   }
   return PrintCommand::args_num;
 }
@@ -52,76 +54,67 @@ int PrintCommand::execute(std::list<std::string> info) {
 int SleepCommand::execute(std::list<std::string> info) {
   // converts number of seconds from string to int
   int mil_sec_n;
-  auto *i = new Interpreter(SymbolTable::get_instance()->get_server_map());
+  auto *i = new Interpreter(SymbolTable::get_instance()->get_main_map());
   Expression* e = i->interpret(info.back());
   mil_sec_n = (int) e->calculate();
   std::chrono::milliseconds timespan(mil_sec_n);
   delete i;
+  delete e;
   return SleepCommand::args_num;
 }
 
 int DefineVarCommand::execute(std::list<std::string> info) {
   // object foe keeping the variable data
-  VariableData vd;
+  VariableData* vd= new VariableData();
   double val;
   bool is_regular_set = false;
   auto iter = info.begin();
-  std::string key = *iter;
+  std::string key_main = *iter;
+  std::string key_sim = info.back();
   iter++;
 
-  if (*iter == "->" || *iter == "<-") {
-    vd.set_arrow_dir(*iter);
-    vd.set_sim(info.back());
+  if (*iter == "->" || *iter == "<-")
+  {
+    vd->set_arrow_dir(*iter);
+    vd->set_sim(info.back());
     is_regular_set = false;
-  } else if (*iter == "=") {
+  }
+  else if (*iter == "=")
+  {
       is_regular_set = true;
-      if (is_expression(info.back())) {
-      vd.set_value(get_exp_value(info.back()));
-    } else if (is_number(info.back())){
-      std::stringstream ss(info.back());
-      ss >> val;
-      vd.set_value(val);
-    } else {
-      // checks if key exists
-      if (SymbolTable::get_instance()->key_exists_server_map(info.back())) {
-        vd.set_value(SymbolTable::get_instance()->get_key_value_server(info.back()).get_value());
-      }
-    }
-  } else {
-    std::cout << "wrong sign for variable";
+      vd->set_value(get_exp_value(info.back()));
+  }
+  else
+  {
+    throw "wrong sign for variable";
   }
 
   //add to map
-  if (vd.get_arrow() == "<-" || vd.get_arrow() == "->") {
-      SymbolTable::get_instance()->add_to_sim(key, vd);
+  if (vd->get_arrow() == "<-" || vd->get_arrow() == "->")
+  {
+      SymbolTable::get_instance()->add_to_sim(key_sim, vd);
   }
-  SymbolTable::get_instance()->add_to_server(key, vd);
+    SymbolTable::get_instance()->add_to_main(key_main, vd);
 
   return is_regular_set ? DefineVarCommand::args_num-1 : DefineVarCommand::args_num;
 }
 
-bool DefineVarCommand::is_expression(std::string string) {
-  std::regex r("(.*[-+/*].*)*");
-  return std::regex_match(string, r);
-}
-
-bool DefineVarCommand::is_number(std::string string) {
-  std::regex r("-?([0-9]+.[0-9]+|[0-9]+)");
-  return std::regex_match(string, r);
-}
-
 double DefineVarCommand::get_exp_value(std::string exp) {
-  auto* interpreter = new Interpreter(SymbolTable::get_instance()->get_server_map());
+  auto* interpreter = new Interpreter(SymbolTable::get_instance()->get_main_map());
   Expression* e = interpreter->interpret(exp);
   delete interpreter;
-  return e->calculate();
+  double val = e->calculate();
+  delete e;
+  return val;
 }
 
 int SetValueCommand::execute(std::list<std::string> info) {
-    auto* interpreter = new Interpreter(SymbolTable::get_instance()->get_server_map());
+    auto* interpreter = new Interpreter(SymbolTable::get_instance()->get_main_map());
     Expression* e = interpreter->interpret(info.back());
+    delete interpreter;
     double val = e->calculate();
-    SymbolTable::get_instance()->get_key_value_server(info.front()).set_value(val);
+    delete e;
+    SymbolTable::get_instance()->get_value_from_main_map(info.front())->set_value(val);
     // inform the simulator of the value placement
     UpdateSimulator::get_instance()->add_update(info.front());
     return SetValueCommand::args_num;
@@ -135,12 +128,14 @@ int WhileCommand::execute(std::list<std::string> info) {
     string exp2 = info.front();
     info.pop_front();
 
-    auto* interpreter = new Interpreter(SymbolTable::get_instance()->get_server_map());
+    auto* interpreter = new Interpreter(SymbolTable::get_instance()->get_main_map());
     Expression* e1 = interpreter->interpret(exp1);
     Expression* e2 = interpreter->interpret(exp2);
+    delete interpreter;
     double val1 = e1->calculate();
     double val2 = e2->calculate();
-
+    delete e1;
+    delete e2;
     info.pop_front(); // remove '{'
     info.pop_back(); // remove '}'
 
@@ -162,12 +157,14 @@ int IfCommand::execute(std::list<std::string> info) {
     string exp2 = info.front();
     info.pop_front();
 
-    auto* interpreter = new Interpreter(SymbolTable::get_instance()->get_server_map());
+    auto* interpreter = new Interpreter(SymbolTable::get_instance()->get_main_map());
     Expression* e1 = interpreter->interpret(exp1);
     Expression* e2 = interpreter->interpret(exp2);
+    delete interpreter;
     double val1 = e1->calculate();
     double val2 = e2->calculate();
-
+    delete e1;
+    delete e2;
     info.pop_front(); // remove '{'
     info.pop_back(); // remove '}'
 

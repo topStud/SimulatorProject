@@ -26,7 +26,7 @@ private:
 public:
     Server(int port);
     void createSocket();
-    int get_serverSocket();
+    int get_clientSocket();
     void bindSocket();
     void listenAndAccept();
     void readDataFromClient() const;

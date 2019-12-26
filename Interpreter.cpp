@@ -9,8 +9,8 @@
 #include "Interpreter.h"
 #include "Operators.h"
 
-Interpreter::Interpreter(std::map<std::string, VariableData> symbol_table) {
-  varData = new std::map<std::string, VariableData>(symbol_table);
+Interpreter::Interpreter(std::map<std::string, VariableData*> symbol_table) {
+  varData = new std::map<std::string, VariableData*>(symbol_table);
 }
 
 Expression *Interpreter::interpret(const std::string &strExp) {
@@ -200,7 +200,7 @@ void Interpreter::createExpression(queue<string> &q) {
         // string to double
       } else if (isVariable(q.front())) {
         if (varData->find(q.front()) != varData->end()) {
-          numbers.push(new Variable(q.front(), varData->find(q.front())->second.get_value()));
+          numbers.push(new Variable(q.front(), varData->find(q.front())->second->get_value()));
         } else {
           throw "variable was not set";
         }

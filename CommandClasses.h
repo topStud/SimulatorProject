@@ -33,8 +33,6 @@ class DefineVarCommand: public Command {
   static const int args_num = 4;
   DefineVarCommand()= default;
   int execute(std::list<std::string> info) override;
-  bool is_expression(std::string string);
-  bool is_number(std::string string);
   double get_exp_value(std::string exp);
   int getNumOfArgs() const override { return args_num;}
 };

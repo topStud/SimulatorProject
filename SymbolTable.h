@@ -9,17 +9,19 @@
 #include "VariableData.h"
 
 class SymbolTable {
-  std::map<std::string, VariableData> sim_to_server;
-  std::map<std::string, VariableData> server_to_simulator;
+  std::map<std::string, VariableData*> sim_map;
+  std::map<std::string, VariableData*> main_map;
   static SymbolTable* symbol_table_;
-  SymbolTable() : sim_to_server{}, server_to_simulator{} {}
+  SymbolTable() : sim_map{}, main_map{} {}
  public:
-  bool key_exists_server_map(const std::string& key);
-  bool key_exists_sim_map(const std::string& key);
-  VariableData& get_key_value_server(const std::string& key);
-  std::map<std::string, VariableData> get_server_map();
-  void add_to_server(std::string key, VariableData variable_data);
-  void add_to_sim(std::string key, VariableData variable_data);
+  bool is_key_exists_in_main_map(const std::string& key);
+  bool is_key_exists_in_sim_map(const std::string& key);
+  VariableData* get_value_from_main_map(const std::string& key);
+  VariableData* get_value_from_sim_map(const std::string& key);
+  std::map<std::string, VariableData*>& get_main_map();
+  std::map<std::string, VariableData*>& get_sim_map();
+  void add_to_main(std::string key, VariableData* variable_data);
+  void add_to_sim(std::string key, VariableData* variable_data);
   static SymbolTable* get_instance();
   ~SymbolTable();
 };

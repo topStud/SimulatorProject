@@ -67,8 +67,8 @@ void Server::readDataFromClient() const
         std::cout << vec[i] << std::endl;
 }
 
-int Server::get_serverSocket() {
-  return this->m_serverSocket;
+int Server::get_clientSocket() {
+  return this->m_clientSocket;
 }
 
 void runServer(Server server)
@@ -76,7 +76,7 @@ void runServer(Server server)
     while(true)
     {
         if (flag_stop_communication_server) {
-          close(server.get_serverSocket());
+          close(server.get_clientSocket());
           break;
         }
         server.readDataFromClient();

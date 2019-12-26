@@ -23,9 +23,10 @@ class utilities {
   static map<std::string, Command *> commands_map;
 
 public:
-  static vector<std::string> lexer(const char *file_name);
+  static vector<std::string>* lexer(const char *file_name);
   static void parser(vector<std::string> vec, map<std::string, Command *> commandMap);
   static void init_command_map();
+  static void release_command_map();
   static const map<std::string, Command *> &get_command_map() {return commands_map;}
   static  bool calcBoolExp(double exp1, string op, double exp2);
 };

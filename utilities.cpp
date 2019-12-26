@@ -51,7 +51,7 @@ void utilities::lexer_helper(const std::string& str, std::vector<std::string>* t
     }
 }
 
-std::vector<std::string> utilities::lexer(const char* file_name) {
+std::vector<std::string>* utilities::lexer(const char* file_name) {
     std::ifstream in_file {file_name};
     auto* tokens = new std::vector<std::string>;
 
@@ -131,7 +131,7 @@ std::vector<std::string> utilities::lexer(const char* file_name) {
     }
 
     in_file.close();
-    return *tokens;
+    return tokens;
 }
 
 std::string utilities::add_brackets_to_var(std::string expression) {
@@ -199,7 +199,14 @@ void utilities::parser(std::vector<std::string> vec,std::map<std::string, Comman
                 args.push_back(vec[i]);
             }
             else {
-                int numOfArgs = c->getNumOfArgs();
+                int numOfArgs;
+                if(vec[i]=="var" && vec[i+2]== "=")
+                {
+                    numOfArgs = 3;
+                }
+                else {
+                    numOfArgs = c->getNumOfArgs();
+                }
                 for (int k = 0; k < numOfArgs; k++) {
                     args.push_back(vec[i + 1 + k]);
                 }
@@ -249,4 +256,10 @@ bool utilities::calcBoolExp(double val1, string op, double val2)
     {
         throw "unknown boolean operation";
     }
+}
+
+void utilities::release_command_map() {
+    for(auto it = utilities::commands_map.begin(); it != utilities::commands_map.end(); it++ )
+        delete it->second;
+    utilities::commands_map.clear();
 }

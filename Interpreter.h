@@ -15,7 +15,7 @@
 #include "VariableData.h"
 
 class Interpreter {
-  std::map<string, VariableData> *varData;
+  std::map<string, VariableData*> *varData;
   stack<Expression *> numbers;
   static bool isNumber(const string &str);
   static bool isNumber(char i);
@@ -28,7 +28,7 @@ class Interpreter {
   static vector<string> fromStringsToTokens(const string &strExp);
   static void checkBrackets(vector<string> v);
  public:
-  Interpreter(std::map<std::string, VariableData> var_data);
+  Interpreter(std::map<std::string, VariableData*> var_data);
   Expression *interpret(const std::string &strExp);
   ~Interpreter();
 };

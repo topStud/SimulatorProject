@@ -15,16 +15,18 @@ int main(int argc, char *argv[]) {
     std::cout << "file name was not delivered" << std::endl;
     return 1;
   }
-  std::vector<std::string> tokens = utilities::lexer(argv[1]);
-  for(const std::string& s: tokens) {
+  std::vector<std::string>* tokens = utilities::lexer(argv[1]);
+  for(const std::string& s: *tokens) {
     std::cout << s << std::endl;
   }
   //tokens.clear();
   utilities::init_command_map();
-  utilities::parser(tokens,utilities::get_command_map());
+  utilities::parser(*tokens,utilities::get_command_map());
 
   flag_stop_communication_client = true;
   flag_stop_communication_server = true;
+  utilities::release_command_map();
+  delete tokens;
 
 /*
   Command* var_c = new DefineVarCommand();
