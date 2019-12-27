@@ -259,7 +259,7 @@ bool utilities::calcBoolExp(double val1, string op, double val2)
 }
 
 void utilities::release_command_map() {
-    for(auto it = utilities::commands_map.begin(); it != utilities::commands_map.end(); it++ )
-        delete it->second;
+    for(auto & it : utilities::commands_map)
+        delete it.second;
     utilities::commands_map.clear();
 }

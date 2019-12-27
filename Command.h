@@ -11,6 +11,7 @@ class Command {
  public:
   virtual int execute(std::list<std::string> info) = 0;
   virtual int getNumOfArgs() const = 0;
+  virtual ~Command()= default;
 };
 
 #endif //MILESTONE1__COMMAND_H_

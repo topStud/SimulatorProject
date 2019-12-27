@@ -61,10 +61,10 @@ void Server::readDataFromClient() const
     char buffer[325] = {0};
     buffer[324] = '\0';
     int val_read = read( m_clientSocket , buffer, 324);
-    std::cout<< "Num of Bytes: " << val_read <<", Data: " << buffer<<std::endl;
+    //std::cout<< "Num of Bytes: " << val_read <<", Data: " << buffer<<std::endl;
     std::vector<double> vec = splitString(buffer);
-    for (std::size_t i = 0; i < vec.size(); i++)
-        std::cout << vec[i] << std::endl;
+   // for (std::size_t i = 0; i < vec.size(); i++)
+     //   std::cout << vec[i] << std::endl;
 }
 
 int Server::get_clientSocket() {
@@ -99,8 +99,8 @@ std::vector<double> Server::splitString(std::string str) const
         }
     }
 
-    for (std::size_t i = 0; i < vec.size(); i++)
-        std::cout << vec[i] << std::endl;
+    //for (std::size_t i = 0; i < vec.size(); i++)
+      //  std::cout << vec[i] << std::endl;
 
     return vec;
 }

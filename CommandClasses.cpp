@@ -58,16 +58,18 @@ int SleepCommand::execute(std::list<std::string> info) {
   Expression* e = i->interpret(info.back());
   mil_sec_n = (int) e->calculate();
   std::chrono::milliseconds timespan(mil_sec_n);
+  std::this_thread::sleep_for(timespan);
   delete i;
   delete e;
   return SleepCommand::args_num;
 }
 
 int DefineVarCommand::execute(std::list<std::string> info) {
-  // object foe keeping the variable data
+  // object for keeping the variable data
   VariableData* vd= new VariableData();
-  double val;
   bool is_regular_set = false;
+  std::string sim{};
+
   auto iter = info.begin();
   std::string key_main = *iter;
   std::string key_sim = info.back();
@@ -76,7 +78,9 @@ int DefineVarCommand::execute(std::list<std::string> info) {
   if (*iter == "->" || *iter == "<-")
   {
     vd->set_arrow_dir(*iter);
-    vd->set_sim(info.back());
+    sim = info.back();
+    sim.erase(std::remove(sim.begin(), sim.end(), '\"'), sim .end());
+    vd->set_sim(sim);
     is_regular_set = false;
   }
   else if (*iter == "=")
@@ -94,7 +98,7 @@ int DefineVarCommand::execute(std::list<std::string> info) {
   {
       SymbolTable::get_instance()->add_to_sim(key_sim, vd);
   }
-    SymbolTable::get_instance()->add_to_main(key_main, vd);
+  SymbolTable::get_instance()->add_to_main(key_main, vd);
 
   return is_regular_set ? DefineVarCommand::args_num-1 : DefineVarCommand::args_num;
 }

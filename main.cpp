@@ -1,9 +1,7 @@
 #include <iostream>
-
-// command map
 #include <map>
+
 #include "Command.h"
-#include "CommandClasses.h"
 #include "Client.h"
 #include "utilities.h"
 #include "Server.h"
@@ -16,10 +14,10 @@ int main(int argc, char *argv[]) {
     return 1;
   }
   std::vector<std::string>* tokens = utilities::lexer(argv[1]);
-  for(const std::string& s: *tokens) {
-    std::cout << s << std::endl;
-  }
-  //tokens.clear();
+  //for(const std::string& s: *tokens) {
+    //std::cout << s << std::endl;
+  //}
+
   utilities::init_command_map();
   utilities::parser(*tokens,utilities::get_command_map());
 
@@ -27,7 +25,6 @@ int main(int argc, char *argv[]) {
   flag_stop_communication_server = true;
   utilities::release_command_map();
   delete tokens;
-
 /*
   Command* var_c = new DefineVarCommand();
   std::list<std::string> var_l = {"roll", "=", "5"};

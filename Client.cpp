@@ -72,7 +72,7 @@ void start_sock(const Client& c) {
       key = UpdateSimulator::get_instance()->pop_update();
       if (SymbolTable::get_instance()->is_key_exists_in_main_map(key)) {
         value = SymbolTable::get_instance()->get_value_from_main_map(key)->get_value();
-        message = "set " + SymbolTable::get_instance()->get_value_from_main_map(key)->get_sim() + " " + std::to_string(value) + "/r/n";
+        message = "set " + SymbolTable::get_instance()->get_value_from_main_map(key)->get_sim() + " " + std::to_string(value) + "\r\n";
         c.send_message_to_server(message);
       } else {
         std::cout << "an error from the client, the key was not recognized in the map";
