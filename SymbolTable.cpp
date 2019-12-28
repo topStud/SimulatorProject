@@ -28,10 +28,10 @@ std::map<std::string, VariableData*>& SymbolTable::get_main_map() {
   return this->main_map;
 }
 
-std::map<std::string, VariableData*>& SymbolTable::get_sim_map()
+/*std::map<std::string, VariableData*>& SymbolTable::get_sim_map()
 {
     return this->sim_map;
-}
+}*/
 
 void SymbolTable::add_to_main(std::string key, VariableData* variable_data) {
   this->main_map.insert(std::pair<std::string, VariableData*>(key, variable_data));

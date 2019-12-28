@@ -42,7 +42,6 @@ void Server::listenAndAccept()
     } else{
         std::cout<<"Server is now listening ..."<<std::endl;
     }
-
     // accepting a client
     m_clientSocket = accept(m_serverSocket, (struct sockaddr *)&address,
                                (socklen_t*)&address);
@@ -52,7 +51,6 @@ void Server::listenAndAccept()
     } else {
       std::cout << "accepted the client" << std::endl;
     }
-
     close(m_serverSocket); //closing the listening socket
 }
 
@@ -60,8 +58,11 @@ void Server::readDataFromClient()
 {
     char buffer[1025] = {0};
     buffer[1024] = '\0';
-
     int val_read = read( m_clientSocket , buffer, 1024);
+    if(val_read == -1)
+    {
+        throw "Error while reading from simulator";
+    }
     std::string str(buffer);
     std::string::size_type pos = 0;
     while ((pos = str.find('\n', 0)) != std::string::npos)
@@ -99,10 +100,6 @@ std::vector<double> Server::splitString() const
             ss.ignore();
         }
     }
-
-    //for (std::size_t i = 0; i < vec.size(); i++)
-      //  std::cout << vec[i] << std::endl;
-
     return vec;
 }
 

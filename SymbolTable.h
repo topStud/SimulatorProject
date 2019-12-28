@@ -19,7 +19,7 @@ class SymbolTable {
   VariableData* get_value_from_main_map(const std::string& key);
   VariableData* get_value_from_sim_map(const std::string& key);
   std::map<std::string, VariableData*>& get_main_map();
-  std::map<std::string, VariableData*>& get_sim_map();
+  //std::map<std::string, VariableData*>& get_sim_map();
   void add_to_main(std::string key, VariableData* variable_data);
   void add_to_sim(std::string key, VariableData* variable_data);
   static SymbolTable* get_instance();

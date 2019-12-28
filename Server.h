@@ -33,9 +33,6 @@ public:
     void listenAndAccept();
     void readDataFromClient();
     std::vector<double> splitString() const;
-
-
-
 };
 
 // global
