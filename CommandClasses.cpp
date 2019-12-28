@@ -136,7 +136,6 @@ int WhileCommand::execute(std::list<std::string> info) {
     auto* interpreter = new Interpreter(SymbolTable::get_instance()->get_main_map());
     Expression* e1 = interpreter->interpret(exp1);
     Expression* e2 = interpreter->interpret(exp2);
-    delete interpreter;
     double val1 = e1->calculate();
     double val2 = e2->calculate();
     delete e1;
@@ -149,8 +148,15 @@ int WhileCommand::execute(std::list<std::string> info) {
     while (utilities::calcBoolExp(val1,op,val2))
     {
         utilities::parser(vec,utilities::get_command_map());
+        e1 = interpreter->interpret(exp1);
+        e2 = interpreter->interpret(exp2);
+        val1 = e1->calculate();
+        val2 = e2->calculate();
+        delete e1;
+        delete e2;
     }
 
+    delete interpreter;
     return 0;
 }
 
