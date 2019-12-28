@@ -56,39 +56,40 @@ void Server::listenAndAccept()
     close(m_serverSocket); //closing the listening socket
 }
 
-void Server::readDataFromClient() const
+void Server::readDataFromClient()
 {
-    char buffer[325] = {0};
-    buffer[324] = '\0';
-    int val_read = read( m_clientSocket , buffer, 324);
-    //std::cout<< "Num of Bytes: " << val_read <<", Data: " << buffer<<std::endl;
-    std::vector<double> vec = splitString(buffer);
-   // for (std::size_t i = 0; i < vec.size(); i++)
-     //   std::cout << vec[i] << std::endl;
+    char buffer[1025] = {0};
+    buffer[1024] = '\0';
+
+    int val_read = read( m_clientSocket , buffer, 1024);
+    std::string str(buffer);
+    std::string::size_type pos = 0;
+    while ((pos = str.find('\n', 0)) != std::string::npos)
+    {
+        this->m_tempString.append(str.substr(0, pos));
+        std::vector<double> vec = splitString();
+        for(int i=0; i< this->m_commandsVec.size(); i++)
+        {
+            if (SymbolTable::get_instance()->is_key_exists_in_sim_map(this->m_commandsVec[i]))
+            {
+                SymbolTable::get_instance()->get_value_from_sim_map(this->m_commandsVec[i])->set_value(vec[i]);
+            }
+        }
+        str= str.substr(pos+1);
+        this->m_tempString.clear();
+    }
+    this->m_tempString.append(str);
 }
 
 int Server::get_clientSocket() {
   return this->m_clientSocket;
 }
 
-void runServer(Server server)
-{
-    while(true)
-    {
-        if (flag_stop_communication_server) {
-          close(server.get_clientSocket());
-          break;
-        }
-        server.readDataFromClient();
-    }
-
-}
-
-std::vector<double> Server::splitString(std::string str) const
+std::vector<double> Server::splitString() const
 {
     std::vector<double> vec;
 
-    std::stringstream ss(str);
+    std::stringstream ss(this->m_tempString);
 
     for (double i; ss >> i;)
     {
@@ -105,3 +106,14 @@ std::vector<double> Server::splitString(std::string str) const
     return vec;
 }
 
+void runServer(Server server)
+{
+    while(true)
+    {
+        if (flag_stop_communication_server) {
+            close(server.get_clientSocket());
+            break;
+        }
+        server.readDataFromClient();
+    }
+}

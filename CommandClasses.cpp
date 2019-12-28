@@ -72,7 +72,7 @@ int DefineVarCommand::execute(std::list<std::string> info) {
 
   auto iter = info.begin();
   std::string key_main = *iter;
-  std::string key_sim = info.back();
+  std::string key_sim;
   iter++;
 
   if (*iter == "->" || *iter == "<-")
@@ -80,6 +80,7 @@ int DefineVarCommand::execute(std::list<std::string> info) {
     vd->set_arrow_dir(*iter);
     sim = info.back();
     sim.erase(std::remove(sim.begin(), sim.end(), '\"'), sim .end());
+    key_sim = sim;
     vd->set_sim(sim);
     is_regular_set = false;
   }
@@ -94,7 +95,7 @@ int DefineVarCommand::execute(std::list<std::string> info) {
   }
 
   //add to map
-  if (vd->get_arrow() == "<-" || vd->get_arrow() == "->")
+  if (vd->get_arrow() == "<-")
   {
       SymbolTable::get_instance()->add_to_sim(key_sim, vd);
   }
