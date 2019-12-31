@@ -28,6 +28,7 @@ class Interpreter {
   static vector<string> fromStringsToTokens(const string &strExp);
   static void checkBrackets(vector<string> v);
  public:
+  static double get_exp_value(std::string exp, std::map<std::string, VariableData*> symbol_table);
   Interpreter(std::map<std::string, VariableData*> var_data);
   Expression *interpret(const std::string &strExp);
   ~Interpreter();

@@ -1,21 +1,26 @@
 //
 // Created by topaz on 19/12/2019.
 //
+
 #include <thread>
 #include <regex>
+
 #include "CommandClasses.h"
 #include "SymbolTable.h"
 #include "Server.h"
 #include "utilities.h"
 #include "UpdateSimulator.h"
 
+/**
+ * execute function of class OpenServerCommand.
+ * receives a list of strings as a parameter which contains an expression
+ * interpreters the expression which is the port with it we create the server.
+ * serverThread will run separately.
+ * returns the number of strings we expect in the list - 1
+ */
 int OpenServerCommand::execute(std::list<std::string> info)
 {
-    auto* interpreter = new Interpreter(SymbolTable::get_instance()->get_main_map());
-    Expression* e = interpreter->interpret(info.back());
-    delete interpreter;
-    int port= e->calculate();
-    delete e;
+    int port = (int) Interpreter::get_exp_value(info.back(), SymbolTable::get_instance()->get_main_map());
     Server s(port);
     s.createSocket();
     s.bindSocket();
@@ -25,48 +30,65 @@ int OpenServerCommand::execute(std::list<std::string> info)
     return OpenServerCommand::args_num;
 }
 
+/**
+ * execute function of class ConnectCommand.
+ * receives a list of strings as a parameter which contains an ip and port.
+ * creates a client with the ip and port.
+ * creates a thread with the name client which will run separately.
+ * returns the number of strings we expect in the list - 2
+ */
 int ConnectCommand::execute(std::list<std::string> info) {
-  int port;
   std::string ip = *info.begin();
   ip.erase(std::remove(ip.begin(), ip.end(), '\"'), ip.end());
-  // converting the string port to int
-  std::stringstream ss(info.back());
-  ss >> port;
+  int port = (int) Interpreter::get_exp_value(info.back(), SymbolTable::get_instance()->get_main_map());
   Client c(ip, port);
   std::thread client(start_sock, c);
   client.detach();
   return ConnectCommand::args_num;
 }
 
+/**
+ * execute function of class PrintCommand.
+ * receives a list of strings as a parameter which contains expression/ message
+ * prints the message to the console.
+ * returns the number of strings we expect in the list - 1
+ */
 int PrintCommand::execute(std::list<std::string> info) {
+  // checks if a string or expression
   if (info.back()[0] == '\"') {
     std::cout << info.back() << std::endl;
   } else {
-    auto *i = new Interpreter(SymbolTable::get_instance()->get_main_map());
-    Expression* e = i->interpret(info.back());
-    std::cout << e->calculate() << std::endl;
-    delete i;
-    delete e;
+    std::cout << Interpreter::get_exp_value(info.back(), SymbolTable::get_instance()->get_main_map()) << std::endl;
   }
   return PrintCommand::args_num;
 }
 
+/**
+ * execute function of class SleepCommand.
+ * receives a list of strings as a parameter which contains expression.
+ * makes the main thread to wait according to the expression given in the list.
+ * the expression will be in milliseconds.
+ * returns the number of strings we expect in the list - 1
+ */
 int SleepCommand::execute(std::list<std::string> info) {
-  // converts number of seconds from string to int
-  int mil_sec_n;
-  auto *i = new Interpreter(SymbolTable::get_instance()->get_main_map());
-  Expression* e = i->interpret(info.back());
-  mil_sec_n = (int) e->calculate();
+  int mil_sec_n = (int) Interpreter::get_exp_value(info.back(), SymbolTable::get_instance()->get_main_map());
   std::chrono::milliseconds timespan(mil_sec_n);
   std::this_thread::sleep_for(timespan);
-  delete i;
-  delete e;
   return SleepCommand::args_num;
 }
 
+/**
+ * execute function of class DefineVarCommand.
+ * receives a list of strings as a parameter which contains a
+ * declaration of a variable separated to tokens.
+ * enters the variables to the symbol table.
+ * main map will contain all declared variables and the sim map will
+ * contain the variables which connect in some way to the simulator.
+ * returns the number of strings we expect in the list - 4/5
+ */
 int DefineVarCommand::execute(std::list<std::string> info) {
   // object for keeping the variable data
-  VariableData* vd= new VariableData();
+  auto* vd= new VariableData();
   bool is_regular_set = false;
   std::string sim{};
 
@@ -75,6 +97,7 @@ int DefineVarCommand::execute(std::list<std::string> info) {
   std::string key_sim;
   iter++;
 
+  // relates to simulator
   if (*iter == "->" || *iter == "<-")
   {
     vd->set_arrow_dir(*iter);
@@ -84,10 +107,11 @@ int DefineVarCommand::execute(std::list<std::string> info) {
     vd->set_sim(sim);
     is_regular_set = false;
   }
+  // some var declared, not relates to the simulator
   else if (*iter == "=")
   {
       is_regular_set = true;
-      vd->set_value(get_exp_value(info.back()));
+      vd->set_value(Interpreter::get_exp_value(info.back(), SymbolTable::get_instance()->get_main_map()));
   }
   else
   {
@@ -104,27 +128,26 @@ int DefineVarCommand::execute(std::list<std::string> info) {
   return is_regular_set ? DefineVarCommand::args_num-1 : DefineVarCommand::args_num;
 }
 
-double DefineVarCommand::get_exp_value(std::string exp) {
-  auto* interpreter = new Interpreter(SymbolTable::get_instance()->get_main_map());
-  Expression* e = interpreter->interpret(exp);
-  delete interpreter;
-  double val = e->calculate();
-  delete e;
-  return val;
-}
-
+/**
+ * execute function of class SetValueCommand.
+ * receives a list of strings as a parameter which contains name of var, =, and expression.
+ * the function updates the value of the Variable and notifies that the simulator needs to be updated.
+ * returns the number of strings we expect in the list - 3
+ */
 int SetValueCommand::execute(std::list<std::string> info) {
-    auto* interpreter = new Interpreter(SymbolTable::get_instance()->get_main_map());
-    Expression* e = interpreter->interpret(info.back());
-    delete interpreter;
-    double val = e->calculate();
-    delete e;
+    double val = Interpreter::get_exp_value(info.back(), SymbolTable::get_instance()->get_main_map());
     SymbolTable::get_instance()->get_value_from_main_map(info.front())->set_value(val);
     // inform the simulator of the value placement
     UpdateSimulator::get_instance()->add_update(info.front());
     return SetValueCommand::args_num;
 }
 
+/**
+ * execute function of class WhileCommand.
+ * receives a list of strings as a parameter which contains the condition and the commands in the brackets.
+ * checks if the condition holds and acts accordingly.
+ * returns 0 (the calculation happens in the parser)
+ */
 int WhileCommand::execute(std::list<std::string> info) {
     string exp1 = info.front();
     info.pop_front();
@@ -133,13 +156,9 @@ int WhileCommand::execute(std::list<std::string> info) {
     string exp2 = info.front();
     info.pop_front();
 
-    auto* interpreter = new Interpreter(SymbolTable::get_instance()->get_main_map());
-    Expression* e1 = interpreter->interpret(exp1);
-    Expression* e2 = interpreter->interpret(exp2);
-    double val1 = e1->calculate();
-    double val2 = e2->calculate();
-    delete e1;
-    delete e2;
+    double val1 = Interpreter::get_exp_value(exp1, SymbolTable::get_instance()->get_main_map());
+    double val2 = Interpreter::get_exp_value(exp2, SymbolTable::get_instance()->get_main_map());
+
     info.pop_front(); // remove '{'
     info.pop_back(); // remove '}'
 
@@ -148,18 +167,18 @@ int WhileCommand::execute(std::list<std::string> info) {
     while (utilities::calcBoolExp(val1,op,val2))
     {
         utilities::parser(vec,utilities::get_command_map());
-        e1 = interpreter->interpret(exp1);
-        e2 = interpreter->interpret(exp2);
-        val1 = e1->calculate();
-        val2 = e2->calculate();
-        delete e1;
-        delete e2;
+        val1 = Interpreter::get_exp_value(exp1, SymbolTable::get_instance()->get_main_map());
+        val2 = Interpreter::get_exp_value(exp2, SymbolTable::get_instance()->get_main_map());
     }
-
-    delete interpreter;
     return 0;
 }
 
+/**
+ * execute function of class IfCommand.
+ * receives a list of strings as a parameter which contains the condition and the commands in the brackets.
+ * checks if the condition holds and acts accordingly.
+ * returns 0 (the calculation happens in the parser)
+ */
 int IfCommand::execute(std::list<std::string> info) {
     string exp1 = info.front();
     info.pop_front();
@@ -168,14 +187,9 @@ int IfCommand::execute(std::list<std::string> info) {
     string exp2 = info.front();
     info.pop_front();
 
-    auto* interpreter = new Interpreter(SymbolTable::get_instance()->get_main_map());
-    Expression* e1 = interpreter->interpret(exp1);
-    Expression* e2 = interpreter->interpret(exp2);
-    delete interpreter;
-    double val1 = e1->calculate();
-    double val2 = e2->calculate();
-    delete e1;
-    delete e2;
+    double val1 = Interpreter::get_exp_value(exp1, SymbolTable::get_instance()->get_main_map());
+    double val2 = Interpreter::get_exp_value(exp2, SymbolTable::get_instance()->get_main_map());
+
     info.pop_front(); // remove '{'
     info.pop_back(); // remove '}'
 
@@ -185,6 +199,5 @@ int IfCommand::execute(std::list<std::string> info) {
     {
         utilities::parser(vec,utilities::get_command_map());
     }
-
     return 0;
 }

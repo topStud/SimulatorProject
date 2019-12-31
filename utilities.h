@@ -12,8 +12,8 @@
 #include <fstream>
 #include <regex>
 #include <algorithm>
-
 #include <map>
+
 #include "CommandClasses.h"
 
 class utilities {

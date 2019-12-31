@@ -4,13 +4,20 @@
 
 #include "utilities.h"
 
-
+/**
+ * is_exp function of class utilities.
+ * returns true of the string is an expression.
+ */
 int utilities::is_exp(std::string str) {
     std::regex r("([a-zA-Z0-9]*[ ]?[*/+-][ ]?[a-zA-Z0-9]*[ ]?)*");
     return std::regex_match(str, r);
 }
 
-// gets a string  without brackets. [not expression]
+/**
+ * lexer_helper function of class utilities.
+ * the function receives a string and the vector of tokens.
+ * the function handles cases of expressions and strings.
+ */
 void utilities::lexer_helper(const std::string& str, std::vector<std::string>* tokens) {
     // helpful variables
     std::stringstream ss(str);
@@ -26,7 +33,7 @@ void utilities::lexer_helper(const std::string& str, std::vector<std::string>* t
         if ((is_exp(temp_s))) {
             // erases all the spaces
             temp_s.erase(std::remove(temp_s.begin(), temp_s.end(), ' '), temp_s.end());
-            tokens->push_back(temp_s);
+            tokens->push_back(add_brackets_to_var(temp_s));
             return;
         }
         temp_s.clear();
@@ -38,7 +45,7 @@ void utilities::lexer_helper(const std::string& str, std::vector<std::string>* t
             if (token[0] == '"') {
                 part_of_str = true;
             }
-                // end of string
+            // end of string
             else if (token[token.length() - 1] == '"') {
                 part_of_str = false;
                 tokens->push_back(build_s);
@@ -51,6 +58,11 @@ void utilities::lexer_helper(const std::string& str, std::vector<std::string>* t
     }
 }
 
+/**
+ * lexer function of class utilities.
+ * the function gets a file name and opens a file according to it.
+ * reads it and returns the tokens of the text.
+ */
 std::vector<std::string>* utilities::lexer(const char* file_name) {
     std::ifstream in_file {file_name};
     auto* tokens = new std::vector<std::string>;
@@ -65,8 +77,13 @@ std::vector<std::string>* utilities::lexer(const char* file_name) {
     std::string token{};
     std::string variable{};
     std::string expresion{};
+    std::string bool_exp{};
+    std::string bool_op{};
     std::string line_part{};
+    // regex for identifying words
     std::regex words("[\ta-zA-Z>< -]+");
+    // regex for bool expressions
+    std::regex rgx ("[!=><]+");
     int index;
 
     while(!in_file.eof()) {
@@ -102,7 +119,33 @@ std::vector<std::string>* utilities::lexer(const char* file_name) {
                 ss1 << line;
                 std::replace(line_part.begin(), line_part.end(), '(', ' ');
                 std::replace(line_part.begin(), line_part.end(), ')', ' ');
-            } else if ((index = line.find('=')) != -1 && line.find("while") == -1 && line.find("if") == -1) {
+            }
+            // handles the while and the if option - with or without spaces
+            else if (line.find("while") != -1 || line.find("if") != -1) {
+                int index_key_word = line.find(' ');
+                // enters the key_word "while" / "if"
+                tokens->push_back(line.substr(0, index_key_word));
+                //handles expression
+                bool_exp = line.substr(index_key_word + 1, line.find('{') - index_key_word - 1);
+                //regex
+                std::sregex_token_iterator iter(bool_exp.begin(), bool_exp.end(), rgx, -1);
+                std::sregex_token_iterator end;
+                // first exp
+                token = *iter;
+                token.erase(std::remove(token.begin(), token.end(), ' '), token.end());
+                tokens->push_back(add_brackets_to_var(token));
+                // finding op
+                bool_op = bool_exp.substr(token.length(), bool_exp.length() - token.length() - (*++iter).length());
+                bool_op.erase(std::remove(bool_op.begin(), bool_op.end(), ' '), bool_op.end());
+                tokens->push_back(bool_op);
+                // second exp
+                token = *iter;
+                token.erase(std::remove(token.begin(), token.end(), ' '), token.end());
+                tokens->push_back(add_brackets_to_var(token));
+                tokens->push_back("{");
+                continue;
+            } else if ((index = line.find('=')) != -1) {
+                // in case there was tab before
                 if (line[0] == ' ')
                     variable = line.substr(1, index - 1);
                 else
@@ -113,6 +156,7 @@ std::vector<std::string>* utilities::lexer(const char* file_name) {
                 if ((idx = variable.find(' '))!= -1)
                 {
                     string tmp_variable = variable.substr(0, idx);
+                    // if a variable is declared with '='
                     if(tmp_variable == "var")
                     {
                         tokens->push_back(tmp_variable);
@@ -125,15 +169,19 @@ std::vector<std::string>* utilities::lexer(const char* file_name) {
                 tokens->push_back(add_brackets_to_var(expresion));
                 continue;
             }
-
+            // continues to the next check
             lexer_helper(line_part, tokens);
         }
     }
-
     in_file.close();
     return tokens;
 }
 
+/**
+ * add_brackets_to_var function of class utilities.
+ * the function adds brackets to each variable (not declared, but variables in expressions)
+ * returns the new expression after the brackets addition.
+ */
 std::string utilities::add_brackets_to_var(std::string expression) {
   // vars for the check
   std::regex r("(.*[a-zA-Z]+.*)*");
@@ -168,6 +216,10 @@ std::string utilities::add_brackets_to_var(std::string expression) {
   return new_exp;
 }
 
+/**
+ * init_command_map function of class utilities.
+ * initializes the command map.
+ */
 void utilities::init_command_map() {
     utilities::commands_map["openDataServer"] = new OpenServerCommand();
     utilities::commands_map["connectControlClient"] = new ConnectCommand();
@@ -179,6 +231,11 @@ void utilities::init_command_map() {
     utilities::commands_map["if"] = new IfCommand();
 }
 
+/**
+ * parser function of class utilities.
+ * receives a vector of tokens and the command map.
+ * goes througth the tokens and generates the correct command each iteration.
+ */
 void utilities::parser(std::vector<std::string> vec,std::map<std::string, Command*> commandMap)
 {
     int i = 0;
@@ -226,6 +283,12 @@ void utilities::parser(std::vector<std::string> vec,std::map<std::string, Comman
     }
 }
 
+/**
+ * calcBoolExp function of class utilities.
+ * receives two values and a boolean operator.
+ * compares the values according to the operator.
+ * returns the result of the comparison - true/ flase.
+ */
 bool utilities::calcBoolExp(double val1, string op, double val2)
 {
     if(op == "<")
@@ -258,6 +321,10 @@ bool utilities::calcBoolExp(double val1, string op, double val2)
     }
 }
 
+/**
+ * release_command_map function of class utilities.
+ * releases all the allocated memory of the command map.
+ */
 void utilities::release_command_map() {
     for(auto & it : utilities::commands_map)
         delete it.second;

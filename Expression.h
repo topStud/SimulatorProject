@@ -6,6 +6,7 @@
 #define PROJECT_EXPRESSION_H
 
 using namespace std;
+
 /**
  * Expression Interface
  */
