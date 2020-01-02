@@ -14,7 +14,7 @@ class Value : public Expression {
  public:
   explicit Value(double value) : val(value) {}
   double calculate() override;
-  ~Value() override;
+  ~Value() override = default;
 };
 
 class BinaryOperator : public Expression {
@@ -38,7 +38,7 @@ class Variable : public Expression {
   Variable &operator+=(double val);
   Variable &operator-=(double val);
   double calculate() override;
-  ~Variable() override;
+  ~Variable() override = default;
 };
 
 class UnaryOperator : public Expression {

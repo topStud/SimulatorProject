@@ -9,10 +9,22 @@
 #include "Interpreter.h"
 #include "Operators.h"
 
+/**
+ * constructor of the class Interpreter.
+ * receives a symbol table. according to it, the interpreter will
+ * know the values of the variables handed to it.
+ */
 Interpreter::Interpreter(std::map<std::string, VariableData*> symbol_table) {
   varData = new std::map<std::string, VariableData*>(symbol_table);
 }
 
+/**
+ * interpreter function of the class Interpreter.
+ * the function is the main function for translating a string to expretion (if the expression is legal).
+ * the function calls other functions at the beginning and at the end and the function
+ * itself handles the shunting yard algorithm.
+ * returns the Expression created.
+ */
 Expression *Interpreter::interpret(const std::string &strExp) {
   stack<string> operators;
   queue<string> q;
@@ -92,6 +104,11 @@ Expression *Interpreter::interpret(const std::string &strExp) {
   return numbers.top();
 }
 
+/**
+ * fromStringsToTokens function from class Interpreter.
+ * the function receives a string and separates the string to tokens.
+ * returns vector of tokens.
+ */
 vector<string> Interpreter::fromStringsToTokens(const string &strExp) {
   // prepare variables
   bool isNumMin;
@@ -162,6 +179,12 @@ vector<string> Interpreter::fromStringsToTokens(const string &strExp) {
   return token_v;
 }
 
+/**
+ * checkBrackets function of class Interpreter.
+ * the function checks if for every '(', there is ')'
+ * receives the tokens string and uses a stack for the check.
+ * throws an exception if the order of the brackets is illegal.
+ */
 void Interpreter::checkBrackets(vector<string> v) {
   stack<int> stack;
   for (const string &s : v) {
@@ -180,6 +203,12 @@ void Interpreter::checkBrackets(vector<string> v) {
   }
 }
 
+/**
+ * createExpression function of class Interpreter.
+ * the function receives a queue and according to it
+ * creates expressions according to the algorithm.
+ * int the end the only expression in numbers is the whole expression.
+ */
 void Interpreter::createExpression(queue<string> &q) {
   // useful variables
   Expression *e = nullptr, *left = nullptr, *right = nullptr;
@@ -230,32 +259,60 @@ void Interpreter::createExpression(queue<string> &q) {
   }
 }
 
+/**
+ * isNumber function of class Interpreter.
+ * returns true if the string is a number.
+ */
 bool Interpreter::isNumber(const string &i) {
   regex r("-?([0-9]+.[0-9]+|[0-9]+)");
   return regex_match(i, r);
 }
 
+/**
+ * isNUmber function of class Interpreter.
+ * returns true if the char is a number.
+ */
 bool Interpreter::isNumber(char i) {
   return i <= 57 && i >= 48;
 }
 
+/**
+ * isVariable function in Interpreter.
+ * returns true if the string is a variable.
+ */
 bool Interpreter::isVariable(const string &str) {
   regex r("(_*[a-zA-Z]|_[0-9])[0-9a-zA-Z_]*");
   return regex_match(str, r);
 }
 
+/**
+ * isVariableChar function of class Interpreter.
+ * returns true if the char is a letter or _
+ */
 bool Interpreter::isVariableChar(char i) {
   return (i == '_') || (i >= 65 && i <= 90) || (i >= 97 && i <= 122);
 }
 
+/**
+ * isOperator function of class INterpreter.
+ * returns true if the char is an operator.
+ */
 bool Interpreter::isOperator(char x) {
   return x == '+' || x == '-' || x == '*' || x == '/';
 }
 
+/**
+ * isOperator function of class Interpreter.
+ * returns true if the string is an operator.
+ */
 bool Interpreter::isOperator(const string &str) {
   return str == "+" || str == "-" || str == "*" || str == "/";
 }
 
+/**
+ * precedence function of class Interpreter.
+ * returns 0 for the lowest precedence and 2 for the highest precedence.
+ */
 int Interpreter::precedence(const string &op) {
   if (op == "*" || op == "/")
     return 1;
@@ -265,6 +322,24 @@ int Interpreter::precedence(const string &op) {
     return 0;
 }
 
+/**
+ * destructor of the class Interpreter.
+ * releses alocated memory.
+ */
 Interpreter::~Interpreter() {
   delete varData;
+}
+
+/**
+ * get_exp_value function of class Interpreter.
+ * receives a string - expression - and a map.
+ * interpreters the expression and returns the value of it.
+ */
+double Interpreter::get_exp_value(std::string exp, std::map<std::string, VariableData*> symbol_table) {
+  auto* interpreter = new Interpreter(std::move(symbol_table));
+  Expression* e = interpreter->interpret(exp);
+  delete interpreter;
+  double val = e->calculate();
+  delete e;
+  return val;
 }

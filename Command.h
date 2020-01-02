@@ -6,7 +6,11 @@
 #define MILESTONE1__COMMAND_H_
 
 #include <list>
+#include <string>
 
+/**
+ * Command interface
+ */
 class Command {
  public:
   virtual int execute(std::list<std::string> info) = 0;
