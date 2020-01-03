@@ -13,7 +13,7 @@
 #include <regex>
 #include <algorithm>
 #include <map>
-
+#include <mutex>
 #include "CommandClasses.h"
 
 class utilities {
@@ -28,7 +28,10 @@ public:
   static void init_command_map();
   static void release_command_map();
   static const map<std::string, Command *> &get_command_map() {return commands_map;}
-  static  bool calcBoolExp(double exp1, string op, double exp2);
+  static bool calcBoolExp(double exp1, string op, double exp2);
+  static bool flag_stop_communication;
+  static mutex server_mutex;
+  static mutex client_mutex;
 };
 
 

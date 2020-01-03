@@ -1,13 +1,13 @@
 #include <iostream>
 #include <map>
-
 #include "Command.h"
-#include "Client.h"
 #include "utilities.h"
-#include "Server.h"
 
 // for each type of command keeps the name of the command with the appropriate command object
 map<std::string, Command *> utilities::commands_map;
+bool utilities::flag_stop_communication = false;
+mutex utilities::server_mutex;
+mutex utilities::client_mutex;
 
 /**
  * main function of the program.
@@ -27,12 +27,14 @@ int main(int argc, char *argv[]) {
   utilities::parser(*tokens,utilities::get_command_map());
 
   // terminates the threads
-  flag_stop_communication_client = true;
-  flag_stop_communication_server = true;
+  utilities::flag_stop_communication = true;
   // memory release
   utilities::release_command_map();
   delete tokens;
-
+  utilities::server_mutex.lock();
+  utilities::client_mutex.lock();
+  utilities::server_mutex.unlock();
+  utilities::client_mutex.unlock();
   return 0;
 }
 

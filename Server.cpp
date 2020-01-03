@@ -1,4 +1,5 @@
 #include "Server.h"
+#include "utilities.h"
 
 /**
  * constructor of class Server.
@@ -7,7 +8,6 @@
  */
 Server::Server(int port)
 {
-    flag_stop_communication_server = false;
     this->m_port= port;
 }
 
@@ -137,12 +137,14 @@ std::vector<double> Server::splitString() const
  */
 void runServer(Server server)
 {
+    utilities::server_mutex.lock();
     while(true)
     {
-        if (flag_stop_communication_server) {
+        if (utilities::flag_stop_communication) {
             close(server.get_clientSocket());
             break;
         }
         server.readDataFromClient();
     }
+    utilities::server_mutex.unlock();
 }

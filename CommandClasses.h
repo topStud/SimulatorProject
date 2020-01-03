@@ -5,12 +5,15 @@
 #ifndef MILESTONE1__COMMANDCLASSES_H_
 #define MILESTONE1__COMMANDCLASSES_H_
 #include <list>
-
 #include "Command.h"
 #include "Client.h"
 #include "VariableData.h"
 #include "Expression.h"
 #include "Interpreter.h"
+#include "SymbolTable.h"
+#include "Server.h"
+#include "utilities.h"
+#include "UpdateSimulator.h"
 
 class OpenServerCommand: public Command {
  public:

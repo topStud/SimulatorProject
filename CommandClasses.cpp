@@ -2,14 +2,9 @@
 // Created by topaz on 19/12/2019.
 //
 
-#include <thread>
 #include <regex>
-
+#include <thread>
 #include "CommandClasses.h"
-#include "SymbolTable.h"
-#include "Server.h"
-#include "utilities.h"
-#include "UpdateSimulator.h"
 
 /**
  * execute function of class OpenServerCommand.
@@ -25,8 +20,8 @@ int OpenServerCommand::execute(std::list<std::string> info)
     s.createSocket();
     s.bindSocket();
     s.listenAndAccept();
-    std::thread serverThread(runServer,s);
-    serverThread.detach();
+    std::thread server_thread(runServer,s);
+    server_thread.detach();
     return OpenServerCommand::args_num;
 }
 
@@ -42,8 +37,8 @@ int ConnectCommand::execute(std::list<std::string> info) {
   ip.erase(std::remove(ip.begin(), ip.end(), '\"'), ip.end());
   int port = (int) Interpreter::get_exp_value(info.back(), SymbolTable::get_instance()->get_main_map());
   Client c(ip, port);
-  std::thread client(start_sock, c);
-  client.detach();
+  std::thread client_thread(start_sock, c);
+  client_thread.detach();
   return ConnectCommand::args_num;
 }
 

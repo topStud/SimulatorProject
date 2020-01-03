@@ -23,7 +23,6 @@ class Client {
 };
 
 // global
-static bool flag_stop_communication_client;
 void start_sock(const Client& c);
 
 #endif //MILESTONE1__CLIENT_H_

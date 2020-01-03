@@ -36,7 +36,6 @@ public:
 };
 
 // global
-static bool flag_stop_communication_server;
 void runServer(Server server);
 
 #endif //EX3_SERVER_H

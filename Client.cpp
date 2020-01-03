@@ -5,6 +5,7 @@
 #include "Client.h"
 #include "UpdateSimulator.h"
 #include "SymbolTable.h"
+#include "utilities.h"
 
 /**
  * create_socket function.
@@ -67,7 +68,6 @@ void Client::close_socket() const{
  * initiates the function's fields, and call the connect function.
  */
 Client::Client(const std::string& ip, int port) {
-  flag_stop_communication_client = false;
   client_socket = create_socket();
   connect_com(ip, port);
 }
@@ -80,12 +80,13 @@ Client::Client(const std::string& ip, int port) {
  * each iteration checks if it should terminate.
  */
 void start_sock(const Client& c) {
+  utilities::client_mutex.lock();
   std::string key{}, message{};
   double value;
 
   while (true) {
     // check if the communication continues
-    if (flag_stop_communication_client) {
+    if (utilities::flag_stop_communication) {
       c.close_socket();
       break;
     }
@@ -103,4 +104,5 @@ void start_sock(const Client& c) {
       }
     }
   }
+  utilities::client_mutex.unlock();
 }
