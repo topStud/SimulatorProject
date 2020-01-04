@@ -42,7 +42,7 @@ void utilities::lexer_helper(const std::string& str, std::vector<std::string>* t
         if (((token[0] == '"') ^ (token[token.length() - 1] == '"')) || part_of_str) {
             build_s += (token + " ");
             // beginning of string
-            if (token[0] == '"') {
+            if (token[0] == '"'  && !part_of_str) {
                 part_of_str = true;
             }
             // end of string
@@ -103,6 +103,14 @@ std::vector<std::string>* utilities::lexer(const char* file_name) {
             if (line[index + 1] != ' ')
                 line = std::regex_replace(line, std::regex("<-"), "<- ");
         }
+
+        if (line.find("Print") != std::string::npos && line.find(',') != std::string::npos) {
+          std::replace(line.begin(), line.end(), '(', ' ');
+          std::replace(line.begin(), line.end(), ')', ' ');
+          lexer_helper(line, tokens);
+          continue;
+        }
+
         std::stringstream ss1(line);
         while (getline(ss1, line_part, ',')) {
             // prevents empty strings to enter the vector
@@ -195,20 +203,20 @@ std::string utilities::add_brackets_to_var(std::string expression) {
   }
 
   // adds brackets around vars
-  for (int i = 0; i < expression.length(); i++) {
-    if ((expression[i] >= 'a' && expression[i] <= 'z') || (expression[i] >= 'A' && expression[i] <= 'Z')) {
+  for (char i : expression) {
+    if ((i >= 'a' && i <= 'z') || (i >= 'A' && i <= 'Z')) {
       if (!part_of_str) {
         new_exp += "(";
         part_of_str = true;
       }
     } else {
       // numbers can be part of the variable
-      if (part_of_str && !(expression[i] >= '0' && expression[i] <= '9')) {
+      if (part_of_str && !(i >= '0' && i <= '9')) {
         new_exp += ")";
         part_of_str = false;
       }
     }
-    new_exp += expression[i];
+    new_exp += i;
   }
   if (part_of_str) {
     new_exp += ")";
@@ -234,7 +242,7 @@ void utilities::init_command_map() {
 /**
  * parser function of class utilities.
  * receives a vector of tokens and the command map.
- * goes througth the tokens and generates the correct command each iteration.
+ * goes through the tokens and generates the correct command each iteration.
  */
 void utilities::parser(std::vector<std::string> vec,std::map<std::string, Command*> commandMap)
 {
@@ -287,7 +295,7 @@ void utilities::parser(std::vector<std::string> vec,std::map<std::string, Comman
  * calcBoolExp function of class utilities.
  * receives two values and a boolean operator.
  * compares the values according to the operator.
- * returns the result of the comparison - true/ flase.
+ * returns the result of the comparison - true/ false.
  */
 bool utilities::calcBoolExp(double val1, string op, double val2)
 {
