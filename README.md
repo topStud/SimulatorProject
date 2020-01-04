@@ -6,6 +6,7 @@
 * Preperations
 * How to get started
 * How does it work?
+* GitHub Link
 
 ## Background
 This project was done as an assignment for our programming course - Advanced Programming 1. It shows the following skills -
@@ -32,8 +33,8 @@ For running our project, you should make the following preparations:
 ## How to get started
 After all our preparations are complete, it is time to fly!
 First,  we need to create our server so the simulator can connect to it as a client. For that, we need to run our program as follows:
-open a terminal and write the command - g++ -std=c++14 *.cpp -o a.out
-then the following command will run the program - ./a.out fly.txt
+* open a terminal and write the command - g++ -std=c++14 *.cpp -o a.out
+* then the following command will run the program - ./a.out fly.txt
 Now, our server is ready and waiting for a client.
 The next step will be to open the FlightGear and click on the button "fly!" on the bottom left corner of the screen.
 Enjoy the flight :)
@@ -41,3 +42,6 @@ Enjoy the flight :)
 ## How does it work?
 So how our plane ends up in the air flying?
 In each second our program receives data from the simulator 10 times. This data is according to the XML file we inserted to the FlightGear protocol folder. Also, our program receives a text file with commands. These commands are responsible for updating the simulator with the appropriate values. The simulator receives the new values for the appropriate parameters and takes off.
+
+## GitHub Link
+https://github.com/topStud/SimulatorProject
