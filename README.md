@@ -40,4 +40,4 @@ Enjoy the flight :)
 
 ## How does it work?
 So how our plane ends up in the air flying?
-In each minute our program receives data from the simulator 10 times. This data is according to the XML file we inserted to the FlightGear protocol folder. Also, our program receives a text file with commands. These commands are responsible for updating the simulator with the appropriate values. The simulator receives the new values for the appropriate parameters and takes off.
+In each second our program receives data from the simulator 10 times. This data is according to the XML file we inserted to the FlightGear protocol folder. Also, our program receives a text file with commands. These commands are responsible for updating the simulator with the appropriate values. The simulator receives the new values for the appropriate parameters and takes off.
