@@ -26,6 +26,7 @@ For running our project, you should make the following preparations:
   3) Under "Additional Settings" write the following lines :
     
     --generic=socket,out,10,127.0.0.1,5400,tcp,generic_small
+    
     --telnet=socket,in,10,127.0.0.1,5402,tcp
 
 ## How to get started
