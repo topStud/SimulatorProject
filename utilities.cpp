@@ -92,12 +92,12 @@ std::vector<std::string>* utilities::lexer(const char* file_name) {
         // deletes all the tabs
         std::replace(line.begin(), line.end(), '\t', ' ');
         // adds space before and after an arrow if needed
-        if ((index = line.find("->")) != std::string::npos) {
+        if ((index = line.find("->")) != -1) {
             if (line[index - 1] != ' ')
                 line = std::regex_replace(line, std::regex("->"), " ->");
             if (line[index + 1] != ' ')
                 line = std::regex_replace(line, std::regex("->"), "-> ");
-        } else if ((index = line.find("<-")) != std::string::npos) {
+        } else if ((index = line.find("<-")) != -1) {
             if (line[index - 1] != ' ')
                 line = std::regex_replace(line, std::regex("<-"), " <-");
             if (line[index + 1] != ' ')
@@ -129,7 +129,7 @@ std::vector<std::string>* utilities::lexer(const char* file_name) {
                 std::replace(line_part.begin(), line_part.end(), ')', ' ');
             }
             // handles the while and the if option - with or without spaces
-            else if (line.find("while") != -1 || line.find("if") != -1) {
+            else if (line.find("while") != std::string::npos || line.find("if") != std::string::npos) {
                 int index_key_word = line.find(' ');
                 // enters the key_word "while" / "if"
                 tokens->push_back(line.substr(0, index_key_word));
@@ -246,7 +246,7 @@ void utilities::init_command_map() {
  */
 void utilities::parser(std::vector<std::string> vec,std::map<std::string, Command*> commandMap)
 {
-    int i = 0;
+    unsigned int i = 0;
     while(i< vec.size())
     {
         if(commandMap.find(vec[i]) != commandMap.end())

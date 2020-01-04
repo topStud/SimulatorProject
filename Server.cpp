@@ -88,7 +88,7 @@ void Server::readDataFromClient()
     {
         this->m_tempString.append(str.substr(0, pos));
         std::vector<double> vec = splitString();
-        for(int i=0; i< this->m_commandsVec.size(); i++)
+        for(unsigned int i=0; i< this->m_commandsVec.size(); i++)
         {
             if (SymbolTable::get_instance()->is_key_exists_in_sim_map(this->m_commandsVec[i]))
             {
