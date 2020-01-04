@@ -1,6 +1,6 @@
 # SimulatorProject
 
-## Table of Contents
+## Table of contents
 * Background
 * Goal
 * Preperations
@@ -24,6 +24,7 @@ For running our project, you should make the following preparations:
   1) Enter the FlightGear
   2) Click on the setting button
   3) Under "Additional Settings" write the following lines :
+    
     --generic=socket,out,10,127.0.0.1,5400,tcp,generic_small
     --telnet=socket,in,10,127.0.0.1,5402,tcp
 
